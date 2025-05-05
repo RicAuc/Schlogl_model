@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!-- This project file has been saved by the New GreatSPN Editor, v.100 --><project name="Bistability_test" version="121">
-  <gspn name="PT" show-color-cmd="false" show-fluid-cmd="false" show-timed-cmd="false">
+  <gspn name="PT" show-color-cmd="false" show-fluid-cmd="false" show-timed-cmd="false" zoom="125">
     <nodes>
-      <transition delay="0.03" delay-x="-2.5" delay-y="0.0" label-y="-2.0" name="k1" nservers-x="0.5" type="EXP" x="5.55" y="4.0"/>
-      <transition delay="0.0001" delay-x="-3.5" delay-y="0.0" label-y="-2.0" name="k2" nservers-x="0.5" type="EXP" x="5.55" y="14.0"/>
-      <transition delay="200" delay-x="-0.5" delay-y="2.0" label-y="-2.0" name="k3" nservers-x="0.5" type="EXP" x="15.55" y="4.0"/>
-      <transition delay="3.5" delay-x="-0.5" delay-y="2.0" label-y="-2.0" name="k4" nservers-x="0.5" type="EXP" x="15.55" y="14.0"/>
+      <transition delay="FromList[&quot;KineticsParameters&quot;, 0]" delay-x="-2.5" delay-y="0.0" label-y="-2.0" name="k1" nservers-x="0.5" type="EXP" x="5.55" y="4.0"/>
+      <transition delay="FromList[&quot;KineticsParameters&quot;, 1]" delay-x="-5.0" delay-y="2.5" label-y="-2.0" name="k2" nservers-x="0.5" type="EXP" x="5.55" y="14.0"/>
+      <transition delay="FromList[&quot;KineticsParameters&quot;, 2]" delay-x="-4.5" delay-y="-3.0" label-y="-2.0" name="k3" nservers-x="0.5" type="EXP" x="15.55" y="4.0"/>
+      <transition delay="FromList[&quot;KineticsParameters&quot;, 3]" delay-x="-0.5" delay-y="2.0" label-y="-2.0" name="k4" nservers-x="0.5" type="EXP" x="15.55" y="14.0"/>
       <place label-x="2.0" label-y="0.0" marking="250" name="X1" x="10.0" y="9.0"/>
     </nodes>
     <edges>
