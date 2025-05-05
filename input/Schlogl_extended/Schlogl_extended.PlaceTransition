@@ -1,0 +1,9 @@
+#PLACE  ID
+A	0
+X1	1
+B	2
+#TRANSITION  ID
+Reaction_2	0
+Reaction_1	1
+Reaction_4	2
+Reaction_3	3

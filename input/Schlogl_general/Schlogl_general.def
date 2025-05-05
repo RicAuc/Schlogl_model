@@ -1,0 +1,7 @@
+|1
+Call["function_1", FromList["Kinetics_Parameters.csv", 0]]
+|2
+Call["function_2", FromList["Kinetics_Parameters.csv", 1]]
+|256
+%
+|

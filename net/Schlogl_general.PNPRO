@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- This project file has been saved by the New GreatSPN Editor, v.100 --><project name="Schlogl_model" version="121">
+  <gspn name="PT" show-color-cmd="false" show-fluid-cmd="false" show-timed-cmd="false">
+    <nodes>
+      <place label-x="2.0" label-y="0.0" marking="250" name="X1" x="13.0" y="8.0"/>
+      <transition delay="Call[&quot;function_1&quot;, FromList[&quot;Kinetics_Parameters&quot;, 0]]" delay-x="-7.5" delay-y="15.0" label-y="-2.0" name="Reaction_1" nservers-x="0.5" type="EXP" x="8.55" y="3.0"/>
+      <transition delay="Call[&quot;function_2&quot;, FromList[&quot;Kinetics_Parameters&quot;, 1]]" delay-x="-7.5" delay-y="6.0" label-y="2.0" name="Reaction_2" nservers-x="0.5" type="EXP" x="8.55" y="13.0"/>
+      <transition delay="200" delay-x="1.0" delay-y="0.0" label-y="-2.0" name="Reaction_3" nservers-x="0.5" type="EXP" x="18.55" y="3.0"/>
+      <transition delay="3.5" delay-x="1.0" delay-y="0.0" label-y="2.0" name="Reaction_4" nservers-x="0.5" type="EXP" x="18.55" y="13.0"/>
+    </nodes>
+    <edges>
+      <arc head="X1" kind="OUTPUT" mult="3" mult-x="0.4592032766434073" mult-y="-0.5" tail="Reaction_1">
+        <point x="14.0" y="4.0"/>
+      </arc>
+      <arc head="X1" kind="OUTPUT" mult="2" tail="Reaction_2">
+        <point x="14.0" y="14.0"/>
+      </arc>
+      <arc head="X1" kind="OUTPUT" tail="Reaction_3"/>
+      <arc head="Reaction_4" kind="INPUT" tail="X1"/>
+      <arc head="Reaction_2" kind="INPUT" mult="3" mult-x="-0.5" mult-y="-0.5" tail="X1"/>
+      <arc head="Reaction_1" kind="INPUT" mult="2" mult-x="-0.5" tail="X1"/>
+    </edges>
+  </gspn>
+  <measures gspn-name="PT" name="Measures" simplified-UI="false">
+    <assignments/>
+    <greatspn/>
+    <formulas>
+      <formula comment="Basic statistics of the toolchain execution." language="STAT"/>
+    </formulas>
+  </measures>
+</project>
