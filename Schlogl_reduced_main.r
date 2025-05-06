@@ -14,7 +14,9 @@ if( !dir.exists(solver_dir) ) {
   dir.create(solver_dir) 
 }
 
-files_to_move <- grep(list.files(pattern = net_name, full.names = F), pattern='main', invert=TRUE, value=TRUE)
+model.generation(net_fname = file.path(wd, "net", paste0(net_name, ".PNPRO")))
+
+files_to_move <- grep(list.files(pattern = paste0(net_name, "."), full.names = F), pattern='main', invert=TRUE, value=TRUE)
 
 if (length(files_to_move) > 0) {
   sapply(files_to_move, function(f) {
@@ -25,7 +27,8 @@ if (length(files_to_move) > 0) {
 }
 
 model.analysis(solver_fname = file.path(solver_dir, paste0(net_name, ".solver")),
-               user_files = file.path(wd, "input", net_name, "KineticsParameters"),
+               parameters_fname = "input/Schlogl_reduced/functions_analysis.csv",
+               functions_fname = "input/Schlogl_general/Schlogl_general_analysis/Schlogl_general_Rfunctions.R",
                debug = T,
                f_time = 100,
                s_time = 1,
