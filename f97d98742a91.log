@@ -1,0 +1,125 @@
+/home/docker/data/Schlogl_reduced_analysis/params_Schlogl_reduced-analysis.RDS[1] "[experiment.configurations] Generating configurations..."
+[1] "[experiment.configurations] Reading parameters file"
+[1] "[experiment.configurations] Done reading parameters file"
+[1] "[experiment.configurations] Parsing parameters..."
+[1] "[experiment.configurations] Parsing parameter m;X1;init.gen"
+[1] "[experiment.configurations] Parsing parameter g;KineticsParameters;test;"
+[1] "[experiment.configurations] Done parsing parameters"
+[1] "[experiment.configurations] Done generating configurations"
+[1] "[model.mngr] Generating command template"
+[[1]]
+R version 4.4.3 (2025-02-28)
+Platform: x86_64-pc-linux-gnu
+Running under: Debian GNU/Linux trixie/sid
+
+Matrix products: default
+BLAS:   /usr/lib/x86_64-linux-gnu/openblas-pthread/libblas.so.3 
+LAPACK: /usr/lib/x86_64-linux-gnu/openblas-pthread/libopenblasp-r0.3.29.so;  LAPACK version 3.12.0
+
+locale:
+ [1] LC_CTYPE=en_US.UTF-8       LC_NUMERIC=C              
+ [3] LC_TIME=en_US.UTF-8        LC_COLLATE=en_US.UTF-8    
+ [5] LC_MONETARY=en_US.UTF-8    LC_MESSAGES=en_US.UTF-8   
+ [7] LC_PAPER=en_US.UTF-8       LC_NAME=C                 
+ [9] LC_ADDRESS=C               LC_TELEPHONE=C            
+[11] LC_MEASUREMENT=en_US.UTF-8 LC_IDENTIFICATION=C       
+
+time zone: Etc/UTC
+tzcode source: system (glibc)
+
+attached base packages:
+[1] parallel  stats     graphics  grDevices utils     datasets  methods  
+[8] base     
+
+other attached packages:
+[1] epimod_1.0.0
+
+loaded via a namespace (and not attached):
+[1] compiler_4.4.3
+
+[experiment.run] cmdln_mrk
+X1 250
+[experiment.run] cmdln_params
+X1 250
+
+
+ =========================================================
+|                ODE/SDE Solver                       |
+ =========================================================
+
+ If you find any bug, send an email to beccuti@di.unito.it
+
+=====================INPUT PARAMETERS======================
+
+	Compact CPP code: OFF
+	Type solution: 7
+	Transition policy: Genelarized Mass Action policy
+	Solution final time: 100
+	Initial size step: 1e-06
+	Initial  time: 0
+	Abosolute tolerance: 1e-06
+	Relative tolerance: 1e-06
+	Absolute Change: -1
+	Relative Change: 0
+	Epsilon value for TAU-leaping: 0.1
+	Solution runs: 1
+	Initial parameter file: cmdln_params
+	Detailed output: 1
+
+===========================================================
+
+
+START EXECUTION...
+
+
+-----------------------------------------------------------
+		  Reading Parameter
+-----------------------------------------------------------
+New marking of place X1 is 250
+-----------------------------------------------------------
+
+
+ =========================================================
+|		      System equation			  |
+ =========================================================
+
+	dX1/dt = +1*k1_general() -1*k2_general() +1*k3_general() -1*k4_general()
+	X1_0 = 250
+
+
+	Transitions' rate
+		k1: 1
+		k2: 1
+		k3: 1
+		k4: 1
+===========================================================
+
+
+Solution at time 100:
+	X1: -99.90997000000011
+
+
+Place X1
+
+
+END EXECUTION
+
+Results are saved in: Schlogl_reduced-analysis-1-1
+
+=========================== TIME ===========================
+
+	Total time required: 0s.
+
+=========================== TIME ===========================
+
+
+=========================== MEM. ===========================
+
+	Total memory used: 3676KB
+
+=========================== MEM. ===========================
+
+[[1]]
+[1] "Schlogl_reduced-analysis-1.trace"
+
+logical(0)

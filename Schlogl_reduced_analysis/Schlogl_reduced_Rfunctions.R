@@ -21,9 +21,10 @@ kinetic_parameters = function(path.data) {
   return(parameters)
 }
 
-da_vettore = function() {
-
+test = function() {
+  
   # content = as.matrix(c(3.0e-07, 1.0e-04, 1.0e-03, 3.5e+00))
+  content = as.matrix(c(222222, 3333333, 4444444, 5555555))
   
   return(content)
   

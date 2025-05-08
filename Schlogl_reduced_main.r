@@ -26,9 +26,9 @@ if (length(files_to_move) > 0) {
   cat("No .rds files found for", fba_name, "\n")
 }
 
-model.analysis(solver_fname = file.path(solver_dir, paste0(net_name, ".solver")),
+model.analysis(solver_fname = "./input/Schlogl_reduced/Schlogl_reduced.solver",
                parameters_fname = "input/Schlogl_reduced/functions_analysis.csv",
-               functions_fname = "input/Schlogl_general/Schlogl_general_analysis/Schlogl_general_Rfunctions.R",
+               functions_fname = "./functions/Schlogl_reduced_Rfunctions.R",
                debug = T,
                f_time = 100,
                s_time = 1,
