@@ -1,0 +1,5 @@
+m;X1;init.gen;
+c;k1;kinetic_parameters;file = "/home/docker/data/input/KineticsParameters.csv";n=1;
+c;k2;kinetic_parameters;file = "/home/docker/data/input/KineticsParameters.csv";n=2;
+c;k3;kinetic_parameters;file = "/home/docker/data/input/KineticsParameters.csv";n=3;
+c;k4;kinetic_parameters;file = "/home/docker/data/input/KineticsParameters.csv";n=4;

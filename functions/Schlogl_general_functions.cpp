@@ -12,7 +12,7 @@
 #include <cmath>
 #include <iomanip>    // Include for formatting output
 
-double function_1(double *Value,
+double F_k1(double *Value,
                   map <string,int>& NumTrans,
                   map <string,int>& NumPlaces,
                   const vector<string> & NameTrans,
@@ -31,14 +31,14 @@ double function_1(double *Value,
   intensity = X * (X - 1);
   
   double rate = (k1_rate/2) * intensity;
-  
-  cout << "k1 = " << k1_rate;
-  cout << "rate = " << rate;
+  // 
+  // cout << "k1 = " << k1_rate;
+  // cout << "rate = " << rate;
   
   return(rate);
 }
 
-double function_2(double *Value,
+double F_k2(double *Value,
                   map <string,int>& NumTrans,
                   map <string,int>& NumPlaces,
                   const vector<string> & NameTrans,
@@ -49,7 +49,7 @@ double function_2(double *Value,
   
 {
   // Definition of the function exploited to calculate the rate,
-  // in this case for semplicity we define it throught the Mass Action law
+  // in this case for simplicity we define it through the Mass Action law
   
   double intensity = 1.0;
   
@@ -58,8 +58,8 @@ double function_2(double *Value,
   
   double rate = (k2_rate/2) * intensity;
   
-  cout << "k2 = " << k2_rate;
-  cout << "rate = " << rate;
+  // cout << "k2 = " << k2_rate;
+  // cout << "rate = " << rate;
   
   return(rate);
 }

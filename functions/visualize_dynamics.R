@@ -1,51 +1,72 @@
-plot_trace_dashboard <- function(trace_file,
-                                 title = "Visitors Over Time",
-                                 subtitle = "Trace data from simulation",
-                                 ylab = "Value",
-                                 xlab = "Value",
-                                 line_color = "darkred",   # dark green
-                                 fill_color = "red",   # light green
-                                 line_size = 1.2,
-                                 text_size = 14) {
+library(ggplot2)
+library(dplyr)
+library(tidyr)
+library(RColorBrewer)
+library(patchwork)
+
+plot_trace_dashboard_facet <- function(trace_file,
+                                       title = "Dynamical Simulation",
+                                       subtitle = NULL,
+                                       ylab = "Value",
+                                       xlab = "Time",
+                                       line_size = 1.2,
+                                       text_size = 14,
+                                       palette = "Set1",
+                                       max_cols = 4) {
   
-  # Required libraries
-  library(ggplot2)
-  library(dplyr)
-  library(tidyr)
-  
-  # Load and reshape data
   trace <- read.table(trace_file, header = TRUE, sep = "", dec = ".")
   if (!"Time" %in% colnames(trace)) stop("First column must be 'Time'")
   
   trace_long <- trace %>%
     pivot_longer(cols = -Time, names_to = "Variable", values_to = "Value")
   
-  # If multiple variables, use only the first for dashboard-style plot
-  if (length(unique(trace_long$Variable)) > 1) {
-    warning("Multiple variables detected. Only the first will be plotted.")
-    trace_long <- trace_long %>% filter(Variable == unique(Variable)[1])
+  variables <- unique(trace_long$Variable)
+  n_vars <- length(variables)
+
+  y_max <- max(trace_long$Value, na.rm = TRUE)
+
+  # Setup color palette
+  base_colors <- if (n_vars <= 8) {
+    brewer.pal(n = max(3, n_vars), name = palette)
+  } else {
+    colorRampPalette(brewer.pal(8, palette))(n_vars)
   }
-  
-  # Create the plot
-  ggplot(trace_long, aes(x = Time, y = Value)) +
-    geom_area(fill = fill_color, alpha = 0.075) +
-    geom_line(color = line_color, size = line_size) +
-    labs(
+
+  # Build individual plots
+  plot_list <- lapply(seq_along(variables), function(i) {
+    v <- variables[i]
+    df <- filter(trace_long, Variable == v)
+    ggplot(df, aes(x = Time, y = Value)) +
+      geom_area(fill = base_colors[i], alpha = 0.1) +
+      geom_line(color = base_colors[i], linewidth = line_size) +
+      ylim(NA, y_max) + 
+      labs(title = v, x = xlab, y = ylab) +
+      theme_minimal(base_size = text_size) +
+      theme(
+        plot.title = element_text(face = "bold", size = text_size, hjust = 0.5),
+        axis.title = element_text(color = "#444444"),
+        axis.text = element_text(color = "#444444"),
+        panel.grid.major = element_line(color = "gray85", linewidth = 0.3),
+        panel.grid.minor = element_blank(),
+        panel.background = element_rect(fill = "white", color = NA),
+        plot.background = element_rect(fill = "#f8f9fa", color = NA)
+      )
+  })
+
+  # Determine layout
+  n_cols <- min(n_vars, max_cols)
+
+  # Combine with patchwork
+  combined_plot <- wrap_plots(plot_list, ncol = n_cols) +
+    plot_annotation(
       title = title,
       subtitle = subtitle,
-      x = xlab,
-      y = ylab
-    ) +
-    theme_minimal(base_size = text_size) +
-    theme(
-      plot.title = element_text(face = "bold", size = text_size + 2, hjust = 0),
-      plot.subtitle = element_text(color = "gray40", size = text_size - 2, hjust = 0),
-      axis.title.y = element_text(face = "bold", color = "#444444"),
-      axis.text = element_text(color = "#444444"),
-      panel.grid.major = element_line(color = "gray85", size = 0.3),
-      panel.grid.minor = element_blank(),
-      panel.background = element_rect(fill = "white", color = NA),
-      plot.background = element_rect(fill = "#f8f9fa", color = NA),
-      legend.position = "none"
+      theme = theme(
+        plot.title = element_text(face = "bold", size = text_size + 2, hjust = 0),
+        plot.subtitle = element_text(size = text_size - 2, hjust = 0, color = "gray40")
+      )
     )
+
+  return(combined_plot)
 }
+

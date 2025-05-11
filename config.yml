@@ -1,0 +1,43 @@
+settings:
+  - name: extended_simple
+    pnpro: "net/extended_simple.PNPRO"
+    customCPP: null
+    parameters: null
+    functions: null
+    user_files: null
+
+  - name: reduced_simple
+    pnpro: "net/reduced_simple.PNPRO"
+    customCPP: null
+    parameters: null
+    functions: null
+    user_files: null
+    
+  - name: reduced_alternative
+    pnpro: "net/reduced_alternative.PNPRO"
+    customCPP: null
+    parameters: "input/iniData_reduced_alternative.csv"
+    functions: "functions/rfunctions.R"
+    user_files: null
+    
+  - name: reduced_noCPP_FromList
+    pnpro: "net/reduced_noCPP_FromList.PNPRO"
+    customCPP: null
+    parameters: "input/iniData_reduced.csv"
+    functions: "functions/rfunctions.R"
+    user_files: "input/KineticsParameters"
+
+  - name: reduced_noCPP_FromTable
+    pnpro: "net/reduced_noCPP_FromTable.PNPRO"
+    customCPP: null
+    parameters: "input/iniData_reduced.csv"
+    functions: "functions/rfunctions.R"
+    user_files: "input/KineticsParameters.csv"
+
+  - name: reduced_CPP_Call_FromTable
+    pnpro: "net/reduced_CPP_Call_FromTable.PNPRO"
+    customCPP: "functions/Schlogl_general_functions.cpp"
+    parameters: "input/iniData_reduced.csv"
+    functions: "functions/rfunctions.R"
+    user_files: "input/KineticsParameters.csv"
+
