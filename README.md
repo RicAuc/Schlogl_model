@@ -2,7 +2,73 @@
 
 The Schlögl model is an example of a reaction network which exhibits bistability. A canonical bistable network demonstrates noise-induced switching impossible under deterministic dynamics. With species A and B held constant, the number of X molecules flips between two steady states in stochastic simulations, whereas ODEs remain trapped in one basin.
 
+# PNPRO Variants Documentation
+
+Below is a summary of each `.PNPRO` model in the `net/` directory. For each variant, we list its purpose, network topology, and how kinetics parameters are specified.
+
 ---
+
+This repository provides six variations of the Schlögl reaction system, each illustrating a different way to specify kinetics in epimod:
+
+## 1. extended_simple.PNPRO
+
+This model captures the full Schlögl bistable network with three places—`X1` (the autocatalytic species), `X_A` (the A reservoir) and `X_B` (the B/C reservoir)—and four mass‐action transitions:
+
+1. **2 X1 + X_A → 3 X1** 
+2. **3 X1 → 2 X1 + X_A**
+3. **X_B → X1**
+4. **X1 → X_B**  
+
+Each transition’s delay constant (0.03, 0.0001, 200, 3.5 respectively) is defined directly in the PNPRO file, so no external tables or code extensions are needed.
+
+## 2. reduced_simple.PNPRO
+
+Collapses A, B and C into effective birth/death rates for X alone:
+
+- **X → 2 X** (birth)  
+- **2 X → X** (death)  
+
+The two rate constants (k₊, k₋) are pre-computed and embedded directly in the file, yielding a minimal autocatalysis/dissipation model.
+
+## 3. reduced_noCPP_FromList.PNPRO
+
+Same two‐reaction scheme as above, but neither rate is hard‐coded. Instead, epimod’s `FromList` loader reads the **first two entries** of `KineticsParameters` (which contains the four numbers `0.03`, `0.0001`, `200`, `3.5`) at runtime. Lets you tweak paramters by editing the same one-column file, without touching the PNPRO.
+
+## 4. reduced_noCPP_FromTable.PNPRO
+
+Again the two-reaction scheme, this time fetching rates from a tabular file (`KineticsParameters.csv`). A `.def` descriptor and a `.PlaceTransition` map ensure each reaction’s propensity comes from the appropriate table column.
+
+## 5. reduced_CPP_Call_FromTable.PNPRO
+
+Illustrates how to combine table‐driven parameters with a custom C++ rate law. The same two reactions use functions in `functions/Schlogl_general_functions.cpp` to compute propensities, pulling its arguments from the same KineticsParameters.csv table.
+
+### 6. reduced_alternative.PNPRO
+
+This variant reinstates all core Schlögl reactions but externalizes every rate constant via epimod R function executing mechanism.
+
+from `rfunctions.R` as the initial token count for the single place `X1` .
+
+**Rate‐Law Loading**
+  At generation time, epimod reads `input/iniData_reduced_alternative.csv`, which contains:
+
+  ```
+  m;X1;init.gen;
+  c;k1;kinetic_parameters;file="/…/input/KineticsParameters.csv";n=1;
+  c;k2;kinetic_parameters;file="/…/input/KineticsParameters.csv";n=2;
+  c;k3;kinetic_parameters;file="/…/input/KineticsParameters.csv";n=3;
+  c;k4;kinetic_parameters;file="/…/input/KineticsParameters.csv";n=4;
+  ```
+
+  ```r
+  kinetic_parameters(file, n)
+  ```
+
+also in **rfunctions.R to read row *n* of `KineticsParameters.csv` (which holds the values and them as `delay` for transitions). 
+
+This decoupling means you can tweak *any* of the four kinetic constants simply by editing `KineticsParameters.csv`—no changes to the Petri Net definition are required.
+
+---
+
 ### Comparison table of Schlögl–model experimental settings
 
 These variants emphasize both net structure and how kinetics are specified:
