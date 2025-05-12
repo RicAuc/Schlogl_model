@@ -1,7 +1,0 @@
-|1
-Call["F_k1", FromTable["KineticsParameters.csv", 0, 0]]
-|2
-Call["F_k2", FromTable["KineticsParameters.csv", 1, 0]]
-|256
-%
-|
