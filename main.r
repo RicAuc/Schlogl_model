@@ -12,7 +12,7 @@ source(file.path(wd, "functions/visualize_dynamics.R"))
 # load config
 cfg <- yaml::read_yaml("config.yml")
 
-# s = cfg$settings[[6]]
+# s = cfg$settings[[2]]
 for (s in cfg$settings) {
   cat(">>> Processing:", s$name, "...\n")
   
@@ -52,11 +52,14 @@ for (s in cfg$settings) {
     subtitle   = paste0("From '", s$name, "'"),
     ylab       = "Marking",
     xlab       = "Time",
+    just_X1    = T,
+    text_size  = 8.5,
+    line_size = 0.75,
     palette    = "Dark2",
     max_cols   = 3
   )
   ggsave(file.path(plot_dir, paste0(s$name, "_dynamics.pdf")), p,
-         height = 2.5, width = 2.5*3)
+         height = 2.5, width = 2.5)
   
   additional_files <- c("ExitStatusFile", list.files(pattern="\\.log$"),
                         list.files(pattern="_analysis"),

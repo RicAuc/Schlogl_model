@@ -9,10 +9,11 @@ plot_trace_dashboard_facet <- function(trace_file,
                                        subtitle = NULL,
                                        ylab = "Value",
                                        xlab = "Time",
-                                       line_size = 1.2,
-                                       text_size = 14,
+                                       line_size,
+                                       text_size,
                                        palette = "Set1",
-                                       max_cols = 4) {
+                                       just_X1,
+                                       max_cols = 3) {
   
   trace <- read.table(trace_file, header = TRUE, sep = "", dec = ".")
   if (!"Time" %in% colnames(trace)) stop("First column must be 'Time'")
@@ -31,7 +32,13 @@ plot_trace_dashboard_facet <- function(trace_file,
   } else {
     colorRampPalette(brewer.pal(8, palette))(n_vars)
   }
-
+  
+  if(just_X1) {
+    variables = "X1"
+    n_vars <- length(variables)
+    y_max <- max(filter(trace_long, Variable == "X1")$Value, na.rm = TRUE)
+  } 
+  
   # Build individual plots
   plot_list <- lapply(seq_along(variables), function(i) {
     v <- variables[i]
@@ -62,8 +69,8 @@ plot_trace_dashboard_facet <- function(trace_file,
       title = title,
       subtitle = subtitle,
       theme = theme(
-        plot.title = element_text(face = "bold", size = text_size + 2, hjust = 0),
-        plot.subtitle = element_text(size = text_size - 2, hjust = 0, color = "gray40")
+        plot.title = element_text(face = "bold", size = text_size, hjust = 0),
+        plot.subtitle = element_text(size = text_size, hjust = 0, color = "gray40")
       )
     )
 

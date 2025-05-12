@@ -3,12 +3,12 @@
   <gspn name="PT" show-color-cmd="false" show-fluid-cmd="false" show-timed-cmd="false" zoom="200">
     <nodes>
       <place label-x="2.5" label-y="0.0" marking="10000" name="X_A" x="2.0" y="7.0"/>
-      <place label-x="2.0" label-y="0.0" marking="248" name="X1" x="12.0" y="7.0"/>
+      <place label-x="2.0" label-y="0.0" marking="250" name="X1" x="12.0" y="7.0"/>
       <place label-x="2.5" label-y="0.0" marking="20000" name="X_B" x="22.0" y="7.0"/>
       <transition delay="0.0001" delay-x="-3.5" delay-y="0.0" label-y="2.0" name="k2" nservers-x="0.5" type="EXP" x="7.55" y="12.0"/>
-      <transition delay="0.0000003" delay-x="-4.5" delay-y="0.0" label-y="-2.0" name="k1" nservers-x="0.5" type="EXP" x="7.55" y="2.0"/>
+      <transition delay="0.03" delay-x="-4.5" delay-y="0.0" label-y="-2.0" name="k1" nservers-x="0.5" type="EXP" x="7.55" y="2.0"/>
       <transition delay="3.5" delay-x="1.0" delay-y="0.0" label-y="2.0" name="k4" nservers-x="0.5" type="EXP" x="17.55" y="12.0"/>
-      <transition delay="0.001" delay-x="1.0" delay-y="0.0" label-y="-2.0" name="k3" nservers-x="0.5" type="EXP" x="17.55" y="2.0"/>
+      <transition delay="200" delay-x="1.0" delay-y="0.0" label-y="-2.0" name="k3" nservers-x="0.5" type="EXP" x="17.55" y="2.0"/>
     </nodes>
     <edges>
       <arc head="k1" kind="INPUT" mult="2" mult-x="-0.5" tail="X1"/>
