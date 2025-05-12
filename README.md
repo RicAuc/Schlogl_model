@@ -4,7 +4,7 @@ The Schlögl model is an example of a reaction network which exhibits bistabilit
 
 # PNPRO Variants Documentation
 
-Below is a summary of each `.PNPRO` model in the `net/` directory. For each variant, we list its purpose, network topology, and how kinetics parameters are specified.
+Below is a summary of each `.PNPRO` model in the `net` directory. For each variant, we list its purpose, network topology, and how kinetics parameters are specified.
 
 ---
 
@@ -34,15 +34,11 @@ The two rate constants (k₊, k₋) are pre-computed and embedded directly in th
 
 Same two‐reaction scheme as above, but neither rate is hard‐coded. Instead, epimod’s `FromList` loader reads the **first two entries** of `KineticsParameters` (which contains the four numbers `0.03`, `0.0001`, `200`, `3.5`) at runtime. Lets you tweak paramters by editing the same one-column file, without touching the PNPRO.
 
-## 4. reduced_noCPP_FromTable.PNPRO
-
-Again the two-reaction scheme, this time fetching rates from a tabular file (`KineticsParameters.csv`). A `.def` descriptor and a `.PlaceTransition` map ensure each reaction’s propensity comes from the appropriate table column.
-
-## 5. reduced_CPP_Call_FromTable.PNPRO
+## 4. reduced_CPP_Call_FromTable.PNPRO
 
 Illustrates how to combine table‐driven parameters with a custom C++ rate law. The same two reactions use functions in `functions/Schlogl_general_functions.cpp` to compute propensities, pulling its arguments from the same KineticsParameters.csv table.
 
-### 6. reduced_alternative.PNPRO
+## 5. reduced_alternative.PNPRO
 
 This variant reinstates all core Schlögl reactions but externalizes every rate constant via epimod R function executing mechanism.
 
@@ -78,7 +74,6 @@ These variants emphasize both net structure and how kinetics are specified:
 | **extended\_simple**              | 3 places (**X\_A**, **X1**, **X\_B**); 4 transitions coupling chemostat reservoirs to **X1** | Hard-coded numeric delays in the `.PNPRO`                                                   | Full Schlögl system with A/B reservoirs, showing how to model chemostats purely via PN files |
 | **reduced\_simple**               | 1 place (**X1**); 4 core Schlögl transitions (2 X→3 X, 3 X→2 X, ∅→X, X→∅)                    | Hard-coded numeric delays in the `.PNPRO`                                                                                        | Minimal core network, all parameters embedded directly in the PN file                        |
 | **reduced\_noCPP\_FromList**      | Same as **reduced\_simple**                                                                  | `FromList[...]` in PNPRO reads each k₁–k₄ value from an R list supplied at generation time                                       | Demonstrates injecting parameters from R (no compiled code)                                  |
-| **reduced\_noCPP\_FromTable**     | Same as **reduced\_simple**                                                                  | `FromTable[...]` in PNPRO looks up k₁–k₄ in a CSV file at generation time                                                        | Pure R-side table-driven rates, still embedded in the PN definition                          |
 | **reduced\_CPP\_Call\_FromTable** | Same as **reduced\_simple**                                                                  | Transitions k₁–k₂ invoke C++ (`Call[...]`) functions that themselves read from a CSV; k₃–k₄ use numeric delays                   | Hybrid: custom C++ for complex steps, plus table lookup for numeric values                   |
 | **reduced\_alternative**          | Same as **reduced\_simple**                                                                  | All delays set to a dummy constant (`delay="1"`) in PNPRO; at analysis time an external `iniData` CSV supplies real k₁–k₄ values | Decouples net structure from data: defers full parameterization to the analysis phase        |
 
