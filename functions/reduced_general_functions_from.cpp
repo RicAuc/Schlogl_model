@@ -31,7 +31,7 @@ double F_k1(double *Value,
   intensity = X * (X - 1);
   
   double rate = (k1_rate/2) * intensity;
-  // 
+  
   // cout << "k1 = " << k1_rate;
   // cout << "rate = " << rate;
   
@@ -54,12 +54,9 @@ double F_k2(double *Value,
   double intensity = 1.0;
   
   double X = Value[Trans[T].InPlaces[0].Id];
-  intensity = X * (X - 1);
+  intensity = X * (X - 1) * (X - 2);
   
-  double rate = (k2_rate/2) * intensity;
-  
-  // cout << "k2 = " << k2_rate;
-  // cout << "rate = " << rate;
+  double rate = (k2_rate/6) * intensity;
   
   return(rate);
 }

@@ -1,7 +1,7 @@
 init.gen <- function() {
   
   yini.names <- "X1"
-  y_ini <- c(250)
+  y_ini <- 250
   
   names(y_ini) <- yini.names
   y_ini = y_ini[yini.names]

@@ -5,8 +5,8 @@
       <place label-y="-2.0" marking="100000" name="X_A" x="2.0" y="7.0"/>
       <place label-x="2.0" label-y="0.0" marking="250" name="X1" x="12.0" y="7.0"/>
       <place label-y="-2.0" marking="200000" name="X_B" x="22.0" y="7.0"/>
-      <transition delay="0.0001" delay-x="-3.5" delay-y="0.0" label-y="2.0" name="k2" nservers-x="0.5" type="EXP" x="7.55" y="12.0"/>
-      <transition delay="0.0000003" delay-x="-4.5" delay-y="0.0" label-y="-2.0" name="k1" nservers-x="0.5" type="EXP" x="7.55" y="2.0"/>
+      <transition delay="Call[&quot;F_k2&quot;]" delay-x="-4.5" delay-y="0.0" label-y="2.0" name="k2" nservers-x="0.5" type="EXP" x="7.55" y="12.0"/>
+      <transition delay="Call[&quot;F_k1&quot;]" delay-x="-4.5" delay-y="0.0" label-y="-2.0" name="k1" nservers-x="0.5" type="EXP" x="7.55" y="2.0"/>
       <transition delay="3.5" delay-x="1.0" delay-y="0.0" label-y="2.0" name="k4" nservers-x="0.5" type="EXP" x="17.55" y="12.0"/>
       <transition delay="0.001" delay-x="1.0" delay-y="0.0" label-y="-2.0" name="k3" nservers-x="0.5" type="EXP" x="17.55" y="2.0"/>
     </nodes>

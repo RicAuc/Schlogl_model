@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- This project file has been saved by the New GreatSPN Editor, v.100 --><project name="Bistability_test" version="121">
+  <gspn name="PT" show-color-cmd="false" show-fluid-cmd="false" show-timed-cmd="false" zoom="125">
+    <nodes>
+      <transition delay="Call[&quot;F_k1&quot;]" delay-x="-2.0" delay-y="-2.0" label-x="-1.5" label-y="0.0" name="k1" nservers-x="0.5" type="EXP" x="3.55" y="2.0"/>
+      <transition delay="Call[&quot;F_k2&quot;]" delay-x="-2.0" delay-y="2.5" label-x="-1.5" label-y="0.0" name="k2" nservers-x="0.5" type="EXP" x="3.55" y="12.0"/>
+      <transition delay="200" delay-x="-0.5" delay-y="-2.0" label-x="1.5" label-y="0.0" name="k3" nservers-x="0.5" type="EXP" x="13.55" y="2.0"/>
+      <transition delay="3.5" delay-x="-0.5" delay-y="2.0" label-x="1.5" label-y="0.0" name="k4" nservers-x="0.5" type="EXP" x="13.55" y="12.0"/>
+      <place label-x="2.0" label-y="0.0" marking="250" name="X1" x="8.0" y="7.0"/>
+    </nodes>
+    <edges>
+      <arc head="k1" kind="INPUT" mult="2" mult-x="-0.5" tail="X1"/>
+      <arc head="X1" kind="OUTPUT" mult="3" mult-x="-0.03269868538910892" mult-y="-1.0" tail="k1">
+        <point x="9.0" y="3.0"/>
+      </arc>
+      <arc head="X1" kind="OUTPUT" tail="k3"/>
+      <arc head="k4" kind="INPUT" tail="X1"/>
+      <arc head="X1" kind="OUTPUT" mult="2" tail="k2">
+        <point x="9.0" y="13.0"/>
+      </arc>
+      <arc head="k2" kind="INPUT" mult="3" mult-x="-0.5" mult-y="-0.5" tail="X1"/>
+    </edges>
+  </gspn>
+  <measures gspn-name="PT" name="Measures" simplified-UI="false">
+    <assignments/>
+    <greatspn/>
+    <formulas>
+      <formula comment="Basic statistics of the toolchain execution." language="STAT"/>
+    </formulas>
+  </measures>
+</project>

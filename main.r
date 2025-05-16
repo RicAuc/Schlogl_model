@@ -12,7 +12,7 @@ source(file.path(wd, "functions/visualize_dynamics.R"))
 # load config
 cfg <- yaml::read_yaml("config.yml")
 
-# s = cfg$settings[[2]]
+# s = cfg$settings[[4]]
 for (s in cfg$settings) {
   cat(">>> Processing:", s$name, "...\n")
   
@@ -31,7 +31,7 @@ for (s in cfg$settings) {
   ana_args <- list(
     solver_fname   = file.path(solver_dir, paste0(s$name, ".solver")),
     debug          = TRUE,
-    f_time         = 15,
+    f_time         = 50,
     s_time         = 1,
     i_time         = 0
   )
@@ -58,6 +58,7 @@ for (s in cfg$settings) {
     palette    = "Dark2",
     max_cols   = 3
   )
+
   ggsave(file.path(plot_dir, paste0(s$name, "_dynamics.pdf")), p,
          height = 2.5, width = 2.5)
   

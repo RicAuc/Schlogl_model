@@ -10,7 +10,7 @@ Below is a summary of each `.PNPRO` model in the `net` directory. For each varia
 
 This repository provides six variations of the Schlögl reaction system, each illustrating a different way to specify kinetics in epimod:
 
-## 1. extended_simple.PNPRO
+## Extended_simple.PNPRO
 
 This model captures the full Schlögl bistable network with three places—`X1` (the autocatalytic species), `X_A` (the A reservoir) and `X_B` (the B/C reservoir)—and four mass‐action transitions:
 
@@ -21,7 +21,7 @@ This model captures the full Schlögl bistable network with three places—`X1` 
 
 Each transition’s delay constant (0.03, 0.0001, 200, 3.5 respectively) is defined directly in the PNPRO file, so no external tables or code extensions are needed.
 
-## 2. reduced_simple.PNPRO
+## Reduced_simple.PNPRO
 
 Collapses A, B and C into effective birth/death rates for X alone:
 
@@ -30,15 +30,7 @@ Collapses A, B and C into effective birth/death rates for X alone:
 
 The two rate constants (k₊, k₋) are pre-computed and embedded directly in the file, yielding a minimal autocatalysis/dissipation model.
 
-## 3. reduced_noCPP_FromList.PNPRO
-
-Same two‐reaction scheme as above, but neither rate is hard‐coded. Instead, epimod’s `FromList` loader reads the **first two entries** of `KineticsParameters` (which contains the four numbers `0.03`, `0.0001`, `200`, `3.5`) at runtime. Lets you tweak paramters by editing the same one-column file, without touching the PNPRO.
-
-## 4. reduced_CPP_Call_FromTable.PNPRO
-
-Illustrates how to combine table‐driven parameters with a custom C++ rate law. The same two reactions use functions in `functions/Schlogl_general_functions.cpp` to compute propensities, pulling its arguments from the same KineticsParameters.csv table.
-
-## 5. reduced_alternative.PNPRO
+## Reduced_alternative.PNPRO
 
 This variant reinstates all core Schlögl reactions but externalizes every rate constant via epimod R function executing mechanism.
 
@@ -67,16 +59,17 @@ This decoupling means you can tweak *any* of the four kinetic constants simply b
 
 ### Comparison table of Schlögl–model experimental settings
 
-These variants emphasize both net structure and how kinetics are specified:
+These variants emphasize both network topology and how kinetics are specified:
 
-| Variant                           | Topology                                                                                     | Kinetics Specification                                                                                                           | Purpose / Notes                                                                              |
-| --------------------------------- | -------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------- |
-| **extended\_simple**              | 3 places (**X\_A**, **X1**, **X\_B**); 4 transitions coupling chemostat reservoirs to **X1** | Hard-coded numeric delays in the `.PNPRO`                                                   | Full Schlögl system with A/B reservoirs, showing how to model chemostats purely via PN files |
-| **reduced\_simple**               | 1 place (**X1**); 4 core Schlögl transitions (2 X→3 X, 3 X→2 X, ∅→X, X→∅)                    | Hard-coded numeric delays in the `.PNPRO`                                                                                        | Minimal core network, all parameters embedded directly in the PN file                        |
-| **reduced\_noCPP\_FromList**      | Same as **reduced\_simple**                                                                  | `FromList[...]` in PNPRO reads each k₁–k₄ value from an R list supplied at generation time                                       | Demonstrates injecting parameters from R (no compiled code)                                  |
-| **reduced\_CPP\_Call\_FromTable** | Same as **reduced\_simple**                                                                  | Transitions k₁–k₂ invoke C++ (`Call[...]`) functions that themselves read from a CSV; k₃–k₄ use numeric delays                   | Hybrid: custom C++ for complex steps, plus table lookup for numeric values                   |
-| **reduced\_alternative**          | Same as **reduced\_simple**                                                                  | All delays set to a dummy constant (`delay="1"`) in PNPRO; at analysis time an external `iniData` CSV supplies real k₁–k₄ values | Decouples net structure from data: defers full parameterization to the analysis phase        |
-
+| Variant                         | Topology                                                           | Kinetics specification                                                                                                                        | Purpose / Notes                                                                              |
+|---------------------------------|--------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------|
+| **extended_simple**             | 3 places (`X_A`, `X1`, `X_B`); 4 transitions coupling to `X1`      | Delay constants written directly as numeric `delay` attributes in the `.PNPRO`                                                                 | Canonical full-Schlögl model with A/B/C reservoirs defined purely in the Petri Net file     |
+| **extended_CPP_Call**           | 3 places (`X_A`, `X1`, `X_B`); 4 transitions coupling to `X1`      | Each transition uses `Call[...]` to `functions/extended_general_functions.cpp`, computing mass-action rates in C++ with hard-coded constants    | Demonstrates custom C++ rate-law callbacks for the full Schlögl system                      |
+| **reduced_simple**              | 1 place (`X1`); 4 core transitions                                 | Two effective rate constants embedded as fixed `delay` entries in the `.PNPRO`                                                                  | Minimal bistable network with all parameters embedded directly                               |
+| **reduced_noCPP_FromList**      | 1 place (`X1`); 4 core transitions                                 | `<FromList>` in the PNPRO reads the four k₁–k₄ values at generation time from `input/iniData_reduced.csv` via `functions/rfunctions.R`          | Illustrates parameter injection from an external text file using epimod’s `FromList` loader  |
+| **reduced_CPP_Call**            | 1 place (`X1`); 4 core transitions                                 | Each uses `Call[...]` to `functions/reduced_general_functions.cpp`, with k₁–k₄ passed in from `input/iniData_reduced.csv`                        | Integrates C++ rate-law callbacks consuming CSV-supplied parameters                          |
+| **reduced_CPP_Call_FromTable**  | 1 place (`X1`); 4 core transitions                                 | Transitions call `functions/reduced_general_functions_from.cpp`, which reads parameters from `input/KineticsParameters.csv`; uses `rfunctions.R` | Combines table-driven parameter lookup with custom C++ callbacks, illustrating `FromTable`  |
+| **reduced_alternative**         | 1 place (`X1`); 4 core transitions                                 | PNPRO sets all delays to `1`; at generation time `<FromList>` reads k₁–k₄ from `input/iniData_reduced_alternative.csv` via `functions/rfunctions.R` | Decouples network definition from kinetic data, deferring parameterization to analysis phase |
 ---
 
 ## Injecting Custom Kinetics via C++ in epimod
@@ -96,12 +89,30 @@ This approach gives:
 Each C++ function implements the propensity (rate) of a particular reaction in the Petri Net. For example, the autocatalytic step 2 X → 3 X:
 
 ```cpp
-// F_k1: 2 X → 3 X (mass-action with combinatorial factor)
-double F_k1(double *Value, Transition *Trans, int T, double k1_rate) {
-  // Value[] holds current place markings; Trans[T].InPlaces[0].Id gives the index of X
-  double X = Value[ Trans[T].InPlaces[0].Id ];
-  double intensity = X * (X - 1);
-  return (k1_rate / 2.0) * intensity;
+double F_k1(double *Value, map <string,int>& NumTrans, map <string,int>& NumPlaces,
+                  const vector<string> & NameTrans, const struct InfTr* Trans,
+                  const int T, const double& time, double k1_rate)
+  {
+  
+  double intensity = 1.0;
+  double X = Value[Trans[T].InPlaces[0].Id];
+  intensity = X * (X - 1);
+  double rate = (k1_rate/2) * intensity;
+  
+  return(rate);
+}
+
+double F_k2(double *Value, map <string,int>& NumTrans, map <string,int>& NumPlaces,
+                  const vector<string> & NameTrans, const struct InfTr* Trans,
+                  const int T, const double& time, double k2_rate)
+  {
+  
+  double intensity = 1.0;
+  double X = Value[Trans[T].InPlaces[0].Id];
+  intensity = X * (X - 1) * (X - 2);
+  double rate = (k2_rate/6) * intensity;
+  
+  return(rate);
 }
 ```
 
@@ -109,7 +120,7 @@ double F_k1(double *Value, Transition *Trans, int T, double k1_rate) {
 
 ---
 
-### 2. Integration via the `Call[…]` Directive
+### Integration via the `Call[…]` Directive
 
 In the `.PNPRO` definition, we hook in each C++ function with a `Call` directive:
 
