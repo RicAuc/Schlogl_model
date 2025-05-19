@@ -2,6 +2,7 @@
 library(yaml)
 library(epimod)
 # downloadContainers()
+library(parallel)
 
 wd  <- getwd()
 input_dir <- file.path(wd, "input")
@@ -12,7 +13,7 @@ source(file.path(wd, "functions/visualize_dynamics.R"))
 # load config
 cfg <- yaml::read_yaml("config.yml")
 
-# s = cfg$settings[[4]]
+# s = cfg$settings[[10]]
 for (s in cfg$settings) {
   cat(">>> Processing:", s$name, "...\n")
   
@@ -30,7 +31,7 @@ for (s in cfg$settings) {
   file.rename(files, file.path(solver_dir, files))
   ana_args <- list(
     solver_fname   = file.path(solver_dir, paste0(s$name, ".solver")),
-    debug          = TRUE,
+    debug          = FALSE,
     f_time         = 50,
     s_time         = 1,
     i_time         = 0
@@ -42,25 +43,39 @@ for (s in cfg$settings) {
   file.copy(from = s$user_files,
             to = file.path(input_dir, s$name, basename(s$user_files)),
             overwrite = TRUE)
-
+  
+  if(s$SSA){
+    ana_args$solver_type = "SSA"
+    ana_args$parallel_processors = detectCores()
+    ana_args$n_run = ana_args$parallel_processors*10
+  }
+  
   do.call(model.analysis, ana_args)
   
-  trace <- file.path(wd, paste0(s$name, "_analysis/", s$name, "-analysis-1.trace"))
-  p <- plot_trace_dashboard_facet(
-    trace_file = trace,
-    title      = paste("Dynamics of", s$name),
-    subtitle   = paste0("From '", s$name, "'"),
-    ylab       = "Marking",
-    xlab       = "Time",
-    just_X1    = T,
-    text_size  = 8.5,
-    line_size = 0.75,
-    palette    = "Dark2",
-    max_cols   = 3
-  )
-
-  ggsave(file.path(plot_dir, paste0(s$name, "_dynamics.pdf")), p,
-         height = 2.5, width = 2.5)
+  if(s$SSA) {
+    p = plot_stochastics(f_time = 50, s_time = 1, i_time = 0)
+    
+    ggsave(file.path(plot_dir, paste0(s$name, "_dynamics", "_SSA_",".pdf")), p,
+           height = 2.5, width = 3)
+    
+  } else {
+    trace <- file.path(wd, paste0(s$name, "_analysis/", s$name, "-analysis-1.trace"))
+    p <- plot_trace_dashboard_facet(
+      trace_file = trace,
+      title      = paste("Dynamics of", s$name),
+      subtitle   = paste0("From '", s$name, "'"),
+      ylab       = "Marking",
+      xlab       = "Time",
+      just_X1    = T,
+      text_size  = 8.5,
+      line_size = 0.75,
+      palette    = "Dark2",
+      max_cols   = 3
+    )
+    
+    ggsave(file.path(plot_dir, paste0(s$name, "_dynamics.pdf")), p,
+           height = 2.5, width = 2.5)
+  }
   
   additional_files <- c("ExitStatusFile", list.files(pattern="\\.log$"),
                         list.files(pattern="_analysis"),

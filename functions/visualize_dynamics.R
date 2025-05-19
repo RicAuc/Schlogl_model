@@ -145,3 +145,31 @@ plot_sensitivity = function() {
                            labels=c("min","max"))
   
 }
+
+plot_stochastics = function(f_time, s_time, i_time) {
+  # Load required libraries
+  library(ggplot2)
+  library(reshape2)
+  
+  # Read trace data
+  trace <- file.path(wd, paste0(s$name, "_analysis/", s$name, "-analysis-1.trace"))
+  ssa_profiles <- read.table(trace, header = TRUE) %>% select(c(Time, X1))
+  
+  chunks = split(ssa_profiles, ceiling(seq_len(nrow(ssa_profiles))/(f_time+1)))
+  
+  # Reshape data to long format for plotting
+  ssa_long <- melt(chunks, id.vars = "Time", variable.name = "Trajectory", value.name = "Value")  
+  
+  mean_data = ssa_long %>%
+    group_by(Time) %>%
+    dplyr::summarize(Mean = mean(Value, na.rm=TRUE))
+  
+  # Create the plot
+  p = ggplot() +
+    geom_line(data = ssa_long, aes(x = Time, y = Value, group = L1), alpha = 0.3) +
+    geom_line(data = mean_data, aes(x = Time, y = Mean), color = "red", linewidth = 0.75) +
+    labs(title = "Stochastic Trajectories", x = "Time", y = "Value") +
+    theme_minimal()
+  
+  return(p)
+}
