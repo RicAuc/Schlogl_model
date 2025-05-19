@@ -5,6 +5,7 @@ settings:
     parameters: null
     functions: null
     user_files: null
+    sensitivity: FALSE
 
   - name: extended_CPP_Call
     pnpro: "net/extended_CPP_Call.PNPRO"
@@ -12,6 +13,7 @@ settings:
     parameters: null
     functions: null
     user_files: null
+    sensitivity: FALSE
     
   - name: reduced_simple
     pnpro: "net/reduced_simple.PNPRO"
@@ -19,6 +21,7 @@ settings:
     parameters: null
     functions: null
     user_files: null
+    sensitivity: FALSE
     
   - name: reduced_noCPP_FromList
     pnpro: "net/reduced_noCPP_FromList.PNPRO"
@@ -26,6 +29,7 @@ settings:
     parameters: "input/iniData_reduced.csv"
     functions: "functions/rfunctions.R"
     user_files: "input/KineticsParameters"
+    sensitivity: FALSE
     
   - name: reduced_CPP_Call
     pnpro: "net/reduced_CPP_Call.PNPRO"
@@ -33,18 +37,29 @@ settings:
     parameters: null
     functions: null
     user_files: null
-
+    sensitivity: FALSE
+    
   - name: reduced_CPP_Call_FromTable
     pnpro: "net/reduced_CPP_Call_FromTable.PNPRO"
     customCPP: "functions/reduced_general_functions_from.cpp"
     parameters: "input/iniData_reduced.csv"
     functions: "functions/rfunctions.R"
     user_files: "input/KineticsParameters.csv"
-
+    sensitivity: FALSE
+    
   - name: reduced_alternative
     pnpro: "net/reduced_alternative.PNPRO"
     customCPP: null
     parameters: "input/iniData_reduced_alternative.csv"
     functions: "functions/rfunctions.R"
     user_files: null
-
+    sensitivity: FALSE
+    
+  - name: extended_sensitivity
+    pnpro: "net/extended_sensitivity.PNPRO"
+    customCPP: "functions/extended_general_functions.cpp"
+    parameters: "input/iniData_exteded_sensitivity.csv"
+    functions: "functions/rfunctions.R"
+    user_files: null
+    sensitivity: TRUE
+    

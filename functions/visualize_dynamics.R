@@ -77,3 +77,71 @@ plot_trace_dashboard_facet <- function(trace_file,
   return(combined_plot)
 }
 
+plot_sensitivity = function() {
+  
+  load(file.path(wd, paste0(s$name, "_", "analysis"), paste0(s$name, "-", "analysis.RData")))
+  
+  load("./results_sensitivity_analysis/ranking_Schlogl_general-sensitivity.RData")
+  reference <- as.data.frame(read.csv("Input/reference_data.csv",
+                                      header = FALSE,
+                                      sep = ""))
+  
+  listFile = list.files(file.path(wd, paste0(s$name, "_", "analysis")), pattern = ".trace")
+  
+  configID = t(sapply(1:length(listFile),
+                     function(x){
+                       return(c(x,config[[1]][[x]][[3]]))
+                     }))
+  
+  id.traces = as.numeric(gsub("[^[:digit:].]", "", listFile) )
+  
+  ListTraces = lapply(id.traces,
+                     function(x){
+                       trace.tmp=read.table(
+                         paste0(file.path(wd, paste0(s$name, "_analysis"), 
+                                          paste0(s$name, "-", "analysis", "-")), x, ".trace"), header = T)
+                       trace.tmp = data.frame(trace.tmp,ID=rank[which(rank[,2]==x),1])
+                       return(trace.tmp)
+                     })
+  
+  rank2<-lapply(id.traces,
+                function(x){
+                  k1<-config[[5]][[x]][[3]]
+                  k2<-config[[4]][[x]][[3]]
+                  rnk.tmp=data.frame(ID=x,distance = rank$measure[which(rank[,2]==x)],k1_rate=k1, k2_rate=k2)
+                  return(rnk.tmp)
+                })
+  
+  rank2 <- do.call("rbind", rank2)
+  traces <- do.call("rbind", ListTraces)
+  
+  plX1<-ggplot( )+
+    geom_line(data=traces,
+              aes(x=Time/7,y=X1,group=ID,col=ID))+
+    geom_line(data=reference,
+              aes(x=V1/7,y=V2),
+              col="red")+
+    theme(axis.text=element_text(size=18),
+          axis.title=element_text(size=20,face="bold"),
+          legend.text=element_text(size=18),
+          legend.title=element_text(size=20,face="bold"),
+          legend.position="right",
+          legend.key.size = unit(1.3, "cm"),
+          legend.key.width = unit(1.3,"cm") )+
+    labs(x="Time", y="X1",col="Distance")
+  
+  ColMax<-max((rank2$distance-min(rank2$distance))/max(rank2$distance))
+  
+  pl<-ggplot(rank2,aes(x=k1_rate,y=k2_rate,col=(distance-min(distance))/max(distance)))+
+    geom_point(size=3)+
+    theme(axis.text=element_text(size=18),
+          axis.title=element_text(size=20,face="bold"),
+          legend.text=element_text(size=18),
+          legend.title=element_text(size=20,face="bold")) +
+    labs(title="",col="distance",x= "k1",y="k2")+
+    scale_colour_gradientn(colours = c("black","deepskyblue2","cyan"),
+                           values= c(0,.002,1),
+                           breaks=c(0,ColMax),
+                           labels=c("min","max"))
+  
+}
