@@ -77,99 +77,212 @@ plot_trace_dashboard_facet <- function(trace_file,
   return(combined_plot)
 }
 
-plot_sensitivity = function() {
+plot_sensitivity <- function(title,
+                             subtitle,
+                             axis_title_size,
+                             axis_text_size,
+                             legend_text_size,
+                             legend_title_size) {
   
-  load(file.path(wd, paste0(s$name, "_", "analysis"), paste0(s$name, "-", "analysis.RData")))
-  
+  # -- load data (assumes wd and s$name in scope) --
+  load(file.path(wd, paste0(s$name, "_analysis"), paste0(s$name, "-analysis.RData")))
   load("./results_sensitivity_analysis/ranking_Schlogl_general-sensitivity.RData")
-  reference <- as.data.frame(read.csv("Input/reference_data.csv",
-                                      header = FALSE,
-                                      sep = ""))
+  reference <- read.csv("input/upper_stable_state.csv",
+                        header = FALSE, sep = "") %>%
+    rename(TimeRef = V1, X1Ref = V2) %>%
+    mutate(Time = TimeRef / 7)
   
-  listFile = list.files(file.path(wd, paste0(s$name, "_", "analysis")), pattern = ".trace")
+  # collect traces
+  listFile  <- list.files(file.path(wd, paste0(s$name, "_analysis")), pattern = "\\.trace$")
+  id_traces <- as.numeric(gsub("[^0-9]", "", listFile))
+  traces    <- lapply(id_traces, function(x) {
+    df <- read.table(file.path(wd, paste0(s$name, "_analysis"),
+                               paste0(s$name, "-analysis-", x, ".trace")),
+                     header = TRUE)
+    df$ID <- x
+    df$Time <- df$Time / 7
+    return(df)
+  }) %>%
+    bind_rows()
   
-  configID = t(sapply(1:length(listFile),
-                     function(x){
-                       return(c(x,config[[1]][[x]][[3]]))
-                     }))
+  # prepare ranking data
+  rank2 <- lapply(id_traces, function(x) {
+    k1 <- config[[5]][[x]][[3]]
+    k2 <- config[[4]][[x]][[3]]
+    data.frame(ID       = x,
+               distance = rank$measure[rank[,2] == x],
+               k1_rate  = k1,
+               k2_rate  = k2)
+  }) %>%
+    bind_rows() %>%
+    mutate(rel_dist = (distance - min(distance)) / (max(distance) - min(distance)))
   
-  id.traces = as.numeric(gsub("[^[:digit:].]", "", listFile) )
+  # ---- plot 1: trajectories vs reference ----
+  plX1 <- ggplot() +
+    geom_line(data = traces,
+              aes(x = Time, y = X1, group = factor(ID)),
+              color = "steelblue", alpha = 0.3) +
+    geom_line(data = reference,
+              aes(x = Time, y = X1Ref),
+              color = "firebrick", size = 1) +
+    labs(title    = title,
+         subtitle = subtitle,
+         x        = "Time (normalized)",
+         y        = "X1 count") +
+    theme_minimal() +
+    theme(
+      plot.title       = element_text(size = axis_title_size + 2, face = "bold"),
+      plot.subtitle    = element_text(size = axis_title_size, margin = margin(b = 8)),
+      axis.title       = element_text(size = axis_title_size),
+      axis.text        = element_text(size = axis_text_size),
+      legend.position  = "none",
+      panel.grid.minor = element_blank()
+    )
   
-  ListTraces = lapply(id.traces,
-                     function(x){
-                       trace.tmp=read.table(
-                         paste0(file.path(wd, paste0(s$name, "_analysis"), 
-                                          paste0(s$name, "-", "analysis", "-")), x, ".trace"), header = T)
-                       trace.tmp = data.frame(trace.tmp,ID=rank[which(rank[,2]==x),1])
-                       return(trace.tmp)
-                     })
+  # ---- plot 2: parameter scattercolored by relative distance ----
+  plParams <- ggplot(rank2, aes(x = k1_rate, y = k2_rate, color = rel_dist)) +
+    geom_point(size = 3) +
+    scale_color_gradient2(low = "blue", mid = "cyan", high = "red", midpoint = 0.5,
+                          name = "Rel. dist") +
+    labs(x = expression(k[1]),
+         y = expression(k[2]),
+         color = "Relative\nerror") +
+    theme_minimal() +
+    theme(
+      axis.title       = element_text(size = axis_title_size),
+      axis.text        = element_text(size = axis_text_size),
+      legend.title     = element_text(size = legend_title_size, face = "bold"),
+      legend.text      = element_text(size = legend_text_size),
+      panel.grid.minor = element_blank()
+    )
   
-  rank2<-lapply(id.traces,
-                function(x){
-                  k1<-config[[5]][[x]][[3]]
-                  k2<-config[[4]][[x]][[3]]
-                  rnk.tmp=data.frame(ID=x,distance = rank$measure[which(rank[,2]==x)],k1_rate=k1, k2_rate=k2)
-                  return(rnk.tmp)
-                })
-  
-  rank2 <- do.call("rbind", rank2)
-  traces <- do.call("rbind", ListTraces)
-  
-  plX1<-ggplot( )+
-    geom_line(data=traces,
-              aes(x=Time/7,y=X1,group=ID,col=ID))+
-    geom_line(data=reference,
-              aes(x=V1/7,y=V2),
-              col="red")+
-    theme(axis.text=element_text(size=18),
-          axis.title=element_text(size=20,face="bold"),
-          legend.text=element_text(size=18),
-          legend.title=element_text(size=20,face="bold"),
-          legend.position="right",
-          legend.key.size = unit(1.3, "cm"),
-          legend.key.width = unit(1.3,"cm") )+
-    labs(x="Time", y="X1",col="Distance")
-  
-  ColMax<-max((rank2$distance-min(rank2$distance))/max(rank2$distance))
-  
-  pl<-ggplot(rank2,aes(x=k1_rate,y=k2_rate,col=(distance-min(distance))/max(distance)))+
-    geom_point(size=3)+
-    theme(axis.text=element_text(size=18),
-          axis.title=element_text(size=20,face="bold"),
-          legend.text=element_text(size=18),
-          legend.title=element_text(size=20,face="bold")) +
-    labs(title="",col="distance",x= "k1",y="k2")+
-    scale_colour_gradientn(colours = c("black","deepskyblue2","cyan"),
-                           values= c(0,.002,1),
-                           breaks=c(0,ColMax),
-                           labels=c("min","max"))
-  
+  # return a list of plots
+  list(trajectories = plX1, parameter_space = plParams)
 }
 
-plot_stochastics = function(f_time, s_time, i_time) {
-  # Load required libraries
-  library(ggplot2)
-  library(reshape2)
+plot_stochastics <- function(f_time, s_time, i_time,
+                             title, subtitle,
+                             axis_title_size, axis_text_size,
+                             title_size, subtitle_size) {
   
   # Read trace data
-  trace <- file.path(wd, paste0(s$name, "_analysis/", s$name, "-analysis-1.trace"))
-  ssa_profiles <- read.table(trace, header = TRUE) %>% select(c(Time, X1))
+  trace_file <- file.path(wd, paste0(s$name, "_analysis/", s$name, "-analysis-1.trace"))
+  ssa_profiles <- read.table(trace_file, header = TRUE) %>% 
+    select(Time, X1 = X1)
   
-  chunks = split(ssa_profiles, ceiling(seq_len(nrow(ssa_profiles))/(f_time+1)))
+  # Split into runs and re-bind with a Trajectory ID
+  runs <- split(ssa_profiles, ceiling(seq_len(nrow(ssa_profiles)) / (f_time + 1)))
+  ssa_long <- bind_rows(runs, .id = "Trajectory") %>%
+    mutate(Trajectory = factor(Trajectory),
+           Value      = X1) %>%
+    select(Time, Trajectory, Value)
   
-  # Reshape data to long format for plotting
-  ssa_long <- melt(chunks, id.vars = "Time", variable.name = "Trajectory", value.name = "Value")  
-  
-  mean_data = ssa_long %>%
+  # Compute mean trajectory
+  mean_data <- ssa_long %>%
     group_by(Time) %>%
-    dplyr::summarize(Mean = mean(Value, na.rm=TRUE))
+    summarize(Mean = mean(Value, na.rm = TRUE), .groups = "drop")
   
-  # Create the plot
-  p = ggplot() +
-    geom_line(data = ssa_long, aes(x = Time, y = Value, group = L1), alpha = 0.3) +
-    geom_line(data = mean_data, aes(x = Time, y = Mean), color = "red", linewidth = 0.75) +
-    labs(title = "Stochastic Trajectories", x = "Time", y = "Value") +
-    theme_minimal()
+  # Build the plot
+  p <- ggplot() +
+    # plot all individual runs, grouping by Trajectory
+    geom_line(
+      data = ssa_long,
+      aes(x = Time, y = Value, group = Trajectory),
+      alpha = 0.25,
+      color = "black"
+    ) +
+    geom_line(
+      data = mean_data,
+      aes(x = Time, y = Mean),
+      inherit.aes = FALSE,
+      color = "firebrick",
+      linewidth  = 0.9
+    )+
+    labs(title    = title,
+         subtitle = subtitle,
+         x        = "Time",
+         y        = "X1 count") +
+    theme_minimal() +
+    theme(
+      plot.title       = element_text(size = title_size, face = "bold"),
+      plot.subtitle    = element_text(size = subtitle_size, margin = margin(b = 8)),
+      axis.title       = element_text(size = axis_title_size),
+      axis.text        = element_text(size = axis_text_size),
+      panel.grid.major = element_line(color = "grey80"),
+      panel.grid.minor = element_blank()
+    )
   
   return(p)
 }
+
+# calibration_plotting.R
+
+calibration_plotting <- function(results_dir    = "extended_calibration_calibration",
+                                 reference_file = "input/upper_stable_state.csv",
+                                 optim_trace    = "extended_calibration_calibration/extended_calibration-calibration_optim-config.csv",
+                                 output_plot    = "plots/calibration_trajectories.pdf",
+                                 width          = 6,
+                                 height         = 4,
+                                 base_font_size = 14) {
+  
+  # —— 1. Load reference trajectory & optimization trace ——
+  reference_df <- read.table(reference_file, header = F)
+  
+  optim_params <- read.table(optim_trace, header = T)
+  
+  # —— 2. Helper: read a single .trace file and tag by error distance ——
+  read_trace <- function(id) {
+    trace_file <- file.path(
+      results_dir,
+      stringr::str_c("extended_calibration-calibration-", id, ".trace")
+    )
+    df <- read.table(trace_file, header = T )
+    dist <- optim_params %>% filter(id == !!id) %>% pull(distance)
+    df %>% mutate(Distance = dist)
+  }
+  
+  # —— 3. Read and combine all traces ——
+  all_traces <- optim_params$id %>%
+    purrr::map_dfr(read_trace)
+  
+  # —— 4. Build plot ——
+  p <- ggplot(all_traces, aes(x = Time, y = X1, group = Distance, color = Distance)) +
+    geom_line(alpha = 0.4) +
+    geom_line(data = reference_df, aes(x = Time, y = X1),
+              color = "red", linewidth = 1.1) +
+    scale_color_gradient(
+      low      = "red",
+      mid      = "white",
+      high     = "blue",
+      midpoint = median(all_traces$Distance),
+      name     = "Calibration\nerror"
+    ) +
+    labs(
+      title = "Calibration Trajectories vs. Reference",
+      x     = "Time (normalized)",
+      y     = "X1 count"
+    ) +
+    theme_minimal(base_size = base_font_size) +
+    theme(
+      plot.title      = element_text(face = "bold", size = base_font_size + 2),
+      axis.title      = element_text(face = "bold"),
+      legend.position = "right",
+      legend.title    = element_text(face = "bold"),
+      legend.text     = element_text(size = base_font_size - 2),
+      panel.grid.minor = element_blank()
+    )
+  
+  # —— 5. Save plot ——
+  ggsave(filename = output_plot, plot = p,
+         width = width, height = height)
+  
+  invisible(p)
+}
+
+# Example usage:
+# calibration_plotting(
+#   results_dir    = "extended_calibration_calibration",
+#   reference_file = "extended_calibration_calibration/upper_stable_state.csv",
+#   optim_trace    = "extended_calibration_calibration/extended_calibration-calibration_optim-trace.csv",
+#   output_plot    = "plots/extended_calibration_trajectories.pdf"
+# )

@@ -7,6 +7,7 @@ settings:
     user_files: null
     sensitivity: FALSE
     SSA: FALSE
+    index: 1
 
   - name: extended_CPP_Call
     pnpro: "net/extended_CPP_Call.PNPRO"
@@ -16,6 +17,7 @@ settings:
     user_files: null
     sensitivity: FALSE
     SSA: FALSE
+    index: 2
     
   - name: reduced_simple
     pnpro: "net/reduced_simple.PNPRO"
@@ -25,6 +27,7 @@ settings:
     user_files: null
     sensitivity: FALSE
     SSA: FALSE
+    index: 3
     
   - name: reduced_noCPP_FromList
     pnpro: "net/reduced_noCPP_FromList.PNPRO"
@@ -34,6 +37,7 @@ settings:
     user_files: "input/KineticsParameters"
     sensitivity: FALSE
     SSA: FALSE
+    index: 4
     
   - name: reduced_CPP_Call
     pnpro: "net/reduced_CPP_Call.PNPRO"
@@ -43,6 +47,7 @@ settings:
     user_files: null
     sensitivity: FALSE
     SSA: FALSE
+    index: 5
     
   - name: reduced_CPP_Call_FromTable
     pnpro: "net/reduced_CPP_Call_FromTable.PNPRO"
@@ -52,6 +57,7 @@ settings:
     user_files: "input/KineticsParameters.csv"
     sensitivity: FALSE
     SSA: FALSE
+    index: 6
     
   - name: reduced_alternative
     pnpro: "net/reduced_alternative.PNPRO"
@@ -61,6 +67,7 @@ settings:
     user_files: null
     sensitivity: FALSE
     SSA: FALSE
+    index: 7
     
   - name: extended_sensitivity
     pnpro: "net/extended_sensitivity.PNPRO"
@@ -70,6 +77,7 @@ settings:
     user_files: null
     sensitivity: TRUE
     SSA: FALSE
+    index: 8
 
   - name: extended_CPP_Call
     pnpro: "net/extended_CPP_Call.PNPRO"
@@ -79,7 +87,8 @@ settings:
     user_files: null
     sensitivity: FALSE
     SSA: TRUE
-
+    index: 9
+    
   - name: reduced_CPP_Call
     pnpro: "net/reduced_CPP_Call.PNPRO"
     customCPP: "functions/reduced_general_functions.cpp"
@@ -88,4 +97,25 @@ settings:
     user_files: null
     sensitivity: FALSE
     SSA: TRUE
+    index: 10
     
+  - name: extended_All_General
+    pnpro: "net/extended_All_General.PNPRO"
+    customCPP: "functions/all_general_extended.cpp"
+    parameters: null
+    functions: null
+    user_files: null
+    sensitivity: FALSE
+    SSA: TRUE
+    index: 11
+
+  - name: extended_calibration
+    pnpro: "net/extended_calibration.PNPRO"
+    customCPP: null
+    parameters: "input/iniData_exteded_calibration.csv"
+    functions: "functions/rfunctions.R"
+    user_files: null
+    sensitivity: FALSE
+    calibration: TRUE
+    SSA: FALSE
+    index: 12

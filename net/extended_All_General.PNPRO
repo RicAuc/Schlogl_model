@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- This project file has been saved by the New GreatSPN Editor, v.100 --><project name="Bistability" version="121">
+  <gspn name="PT" show-color-cmd="false" show-fluid-cmd="false" show-timed-cmd="false" zoom="200">
+    <nodes>
+      <place label-y="-2.0" marking="100000" name="X_A" x="2.0" y="7.0"/>
+      <place label-x="2.0" label-y="0.0" marking="250" name="X1" x="12.0" y="7.0"/>
+      <place label-y="-2.0" marking="200000" name="X_B" x="22.0" y="7.0"/>
+      <transition delay="Call[&quot;F_k2&quot;]" delay-x="-4.5" delay-y="0.0" label-y="2.0" name="k2" nservers-x="0.5" type="EXP" x="7.55" y="12.0"/>
+      <transition delay="Call[&quot;F_k1&quot;]" delay-x="-4.5" delay-y="0.0" label-y="-2.0" name="k1" nservers-x="0.5" type="EXP" x="7.55" y="2.0"/>
+      <transition delay="Call[&quot;F_k4&quot;]" delay-x="1.0" delay-y="0.0" label-y="2.0" name="k4" nservers-x="0.5" type="EXP" x="17.55" y="12.0"/>
+      <transition delay="Call[&quot;F_k3&quot;]" delay-x="1.0" delay-y="0.0" label-y="-2.0" name="k3" nservers-x="0.5" type="EXP" x="17.55" y="2.0"/>
+    </nodes>
+    <edges>
+      <arc head="k1" kind="INPUT" mult="2" mult-x="-0.5" tail="X1"/>
+      <arc head="k2" kind="INPUT" mult="3" mult-x="-0.5" mult-y="-0.5" tail="X1"/>
+      <arc head="X1" kind="OUTPUT" mult="2" tail="k2">
+        <point x="13.0" y="13.0"/>
+      </arc>
+      <arc head="X1" kind="OUTPUT" tail="k3"/>
+      <arc head="X1" kind="OUTPUT" mult="3" tail="k1">
+        <point x="13.0" y="3.0"/>
+      </arc>
+      <arc head="k3" kind="INPUT" tail="X_B"/>
+      <arc head="X_B" kind="OUTPUT" tail="k4"/>
+      <arc head="k1" kind="INPUT" tail="X_A"/>
+      <arc head="X_A" kind="OUTPUT" tail="k2">
+        <point x="4.0" y="9.0"/>
+      </arc>
+      <arc head="k4" kind="INPUT" tail="X1"/>
+    </edges>
+  </gspn>
+  <measures gspn-name="PT" name="Measures" simplified-UI="false">
+    <assignments/>
+    <greatspn/>
+    <formulas>
+      <formula comment="Basic statistics of the toolchain execution." language="STAT"/>
+    </formulas>
+  </measures>
+</project>
