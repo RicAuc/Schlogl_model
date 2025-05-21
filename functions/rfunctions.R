@@ -13,12 +13,12 @@ kinetic_parameters <- function(file, n) {
   as.numeric(read.csv(file, header = FALSE)[[1]][n])
 }
 
-da_vettore = function() {
-  
-  content = as.matrix(c(3.0e-07, 1.0e-04, 1.0e-03, 3.5e+00))
-  return(content)
-  
-}
+# da_vettore = function() {
+#   
+#   content = as.matrix(c(3.0e-07, 1.0e-04, 1.0e-03, 3.5e+00))
+#   return(content)
+#   
+# }
 
 init.sensitivity = function(n, min, max) {
   round(runif(n, min, max), 1)

@@ -6,6 +6,7 @@ settings:
     functions: null
     user_files: null
     sensitivity: FALSE
+    calibration: FALSE
     SSA: FALSE
     index: 1
 
@@ -16,6 +17,7 @@ settings:
     functions: null
     user_files: null
     sensitivity: FALSE
+    calibration: FALSE
     SSA: FALSE
     index: 2
     
@@ -26,6 +28,7 @@ settings:
     functions: null
     user_files: null
     sensitivity: FALSE
+    calibration: FALSE
     SSA: FALSE
     index: 3
     
@@ -36,6 +39,7 @@ settings:
     functions: "functions/rfunctions.R"
     user_files: "input/KineticsParameters"
     sensitivity: FALSE
+    calibration: FALSE
     SSA: FALSE
     index: 4
     
@@ -46,6 +50,7 @@ settings:
     functions: null
     user_files: null
     sensitivity: FALSE
+    calibration: FALSE
     SSA: FALSE
     index: 5
     
@@ -56,6 +61,7 @@ settings:
     functions: "functions/rfunctions.R"
     user_files: "input/KineticsParameters.csv"
     sensitivity: FALSE
+    calibration: FALSE
     SSA: FALSE
     index: 6
     
@@ -66,6 +72,7 @@ settings:
     functions: "functions/rfunctions.R"
     user_files: null
     sensitivity: FALSE
+    calibration: FALSE
     SSA: FALSE
     index: 7
     
@@ -76,6 +83,7 @@ settings:
     functions: "functions/rfunctions.R"
     user_files: null
     sensitivity: TRUE
+    calibration: FALSE
     SSA: FALSE
     index: 8
 
@@ -86,6 +94,7 @@ settings:
     functions: null
     user_files: null
     sensitivity: FALSE
+    calibration: FALSE
     SSA: TRUE
     index: 9
     
@@ -96,6 +105,7 @@ settings:
     functions: null
     user_files: null
     sensitivity: FALSE
+    calibration: FALSE
     SSA: TRUE
     index: 10
     
@@ -106,6 +116,7 @@ settings:
     functions: null
     user_files: null
     sensitivity: FALSE
+    calibration: FALSE
     SSA: TRUE
     index: 11
 

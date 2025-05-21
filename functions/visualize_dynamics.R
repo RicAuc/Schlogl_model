@@ -4,6 +4,28 @@ library(tidyr)
 library(RColorBrewer)
 library(patchwork)
 
+plot_ref <- function(refdata = ref_trace, outdir = file.path(wd, "plots")) {
+  if (!all(c("Time", "X1") %in% colnames(refdata))) {
+    stop("Expected columns 'Time' and 'X1' not found in the trace.")
+  }
+  
+  if (!dir.exists(outdir)) dir.create(outdir, recursive = TRUE)
+  
+  outfile <- file.path(outdir, "plot_ref.pdf")
+  pdf(outfile, width = 6, height = 4)
+  
+  plot(
+    refdata$Time, refdata$X1,
+    type = "l", col = "#7d0000", lwd = 2,
+    xlab = "Time", ylab = "X1",
+    main = "Reference Trajectory: Upper Stable State"
+  )
+  grid()
+  
+  dev.off()
+  message("Plot saved to: ", outfile)
+}
+
 plot_trace_dashboard_facet <- function(trace_file,
                                        title = "Dynamical Simulation",
                                        subtitle = NULL,
@@ -217,20 +239,19 @@ plot_stochastics <- function(f_time, s_time, i_time,
 
 # calibration_plotting.R
 
-calibration_plotting <- function(results_dir    = "extended_calibration_calibration",
-                                 reference_file = "input/upper_stable_state.csv",
-                                 optim_trace    = "extended_calibration_calibration/extended_calibration-calibration_optim-config.csv",
-                                 output_plot    = "plots/calibration_trajectories.pdf",
-                                 width          = 6,
-                                 height         = 4,
-                                 base_font_size = 14) {
+calibration_plotting <- function(results_dir,
+                                 reference_file,
+                                 optim_trace,
+                                 output_plot,
+                                 width,
+                                 height,
+                                 base_font_size) {
   
   # —— 1. Load reference trajectory & optimization trace ——
-  reference_df <- read.table(reference_file, header = F)
-  
+  reference_df = read.table(reference_trace, header = FALSE, sep = ",")
+  colnames(ref_trace) = c("Time", "X1")
   optim_params <- read.table(optim_trace, header = T)
   
-  # —— 2. Helper: read a single .trace file and tag by error distance ——
   read_trace <- function(id) {
     trace_file <- file.path(
       results_dir,
@@ -241,11 +262,8 @@ calibration_plotting <- function(results_dir    = "extended_calibration_calibrat
     df %>% mutate(Distance = dist)
   }
   
-  # —— 3. Read and combine all traces ——
-  all_traces <- optim_params$id %>%
-    purrr::map_dfr(read_trace)
+  all_traces <- optim_params$id %>% purrr::map_dfr(read_trace)
   
-  # —— 4. Build plot ——
   p <- ggplot(all_traces, aes(x = Time, y = X1, group = Distance, color = Distance)) +
     geom_line(alpha = 0.4) +
     geom_line(data = reference_df, aes(x = Time, y = X1),
@@ -259,8 +277,8 @@ calibration_plotting <- function(results_dir    = "extended_calibration_calibrat
     ) +
     labs(
       title = "Calibration Trajectories vs. Reference",
-      x     = "Time (normalized)",
-      y     = "X1 count"
+      x     = "Time",
+      y     = "X1"
     ) +
     theme_minimal(base_size = base_font_size) +
     theme(
@@ -278,11 +296,3 @@ calibration_plotting <- function(results_dir    = "extended_calibration_calibrat
   
   invisible(p)
 }
-
-# Example usage:
-# calibration_plotting(
-#   results_dir    = "extended_calibration_calibration",
-#   reference_file = "extended_calibration_calibration/upper_stable_state.csv",
-#   optim_trace    = "extended_calibration_calibration/extended_calibration-calibration_optim-trace.csv",
-#   output_plot    = "plots/extended_calibration_trajectories.pdf"
-# )

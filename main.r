@@ -10,9 +10,27 @@ plot_dir  <- file.path(wd, "plots")
 
 source(file.path(wd, "functions/visualize_dynamics.R"))
 
+f_time = 50
+s_time = 1
+i_time = 0
+nodes = 2
+
 cfg <- yaml::read_yaml("config.yml")
 
-save_ref = FALSE
+reference_trace = file.path(input_dir, "upper_stable_state.csv")
+save_ref = 1
+
+if (file.exists(reference_trace)) {
+  ref_trace = read.table(reference_trace, header = FALSE, sep = ",")
+  colnames(ref_trace) = c("Time", "X1")
+  plot_ref()
+  save_ref = FALSE
+  
+} else {
+  cat("Reference trace file not found.", "\n")
+  cat("generate reference data ... ", "\n")
+  save_ref = TRUE
+}
 
 # s = cfg$settings[[12]]
 for (s in cfg$settings) {
@@ -22,8 +40,9 @@ for (s in cfg$settings) {
   if (!is.null(s$customCPP)) gen_args$transitions_fname <- s$customCPP
   do.call(model.generation, gen_args)
   
-  f_time = 50; s_time = 1; i_time = 0
-  nodes = 2
+  if(save_ref){
+    s_time = 0.1
+  }
   
   solver_dir <- file.path(wd, "input", s$name)
   if (!dir.exists(solver_dir)) dir.create(solver_dir, recursive=TRUE)
@@ -58,7 +77,7 @@ for (s in cfg$settings) {
     
     ana_args$parallel_processors = detectCores()
     ana_args$n_config = ana_args$parallel_processors*nodes
-    ana_args$reference_data = "input/upper_stable_state.csv"
+    ana_args$reference_data = reference_trace
     ana_args$distance_measure = "msqd"
     ana_args$target_value = "target"
     
@@ -67,21 +86,26 @@ for (s in cfg$settings) {
   } else {
     
     if ( s$calibration ) {
+      
+      # Relative variation ±20%
+      variation <- 0.2
+      ini_v = c(3e-07, 1e-04, 0.001, 3.5)
+      
       ana_args$parallel_processors = detectCores()
-      ana_args$reference_data = "input/upper_stable_state.csv"
+      ana_args$reference_data = reference_trace
       ana_args$distance_measure = "msqd"
-      ana_args$ini_v = c(0.06, 0.00015, 300, 5)
-      ana_args$ub_v = c(0.08, 0.0002, 800, 8)
-      ana_args$lb_v = c(0.02, 0.00001, 100, 2)
-      ana_args$max.time = 1
+      ana_args$ini_v = ini_v
+      ana_args$ub_v <- ini_v * (1 + variation)
+      ana_args$lb_v <- ini_v * (1 - variation)
+      ana_args$max.time = 10
       
       do.call(model.calibration, ana_args)
     } else {
-      do.call(model.analysis, ana_args) 
+      do.call(model.analysis, ana_args)
     }
   }
   
-  if(s$SSA) {
+  if( s$SSA ) {
     p = plot_stochastics(f_time, s_time, i_time,
                          title = paste("Dynamics of", s$name, "solver: SSA"), 
                          subtitle = paste0("From '", s$name, "'", " - n_run: ", ana_args$n_run),
@@ -94,7 +118,7 @@ for (s in cfg$settings) {
            height = 3, width = 4)
   } 
   
-  if (s$sensitivity) {
+  if ( s$sensitivity ) {
     list_sens_results <- plot_sensitivity(
       title            = "Sensitivity Analysis",
       subtitle         = "Sensitivity Analysis Subtitle",
@@ -119,19 +143,26 @@ for (s in cfg$settings) {
       palette    = "Dark2",
       max_cols   = 3)
     
+    ggsave(file.path(plot_dir, paste0(s$name, "_dynamics.pdf")), p,
+           height = 2.5, width = 2.5)
+    
     if(save_ref) {
       trace <- read.table(
         file.path(wd, paste0(s$name, "_analysis/", s$name, "-analysis-1.trace")), 
         header = TRUE, sep = "", dec = ".")
       
-      write.table(trace, file = file.path(wd, "input", "upper_stable_state.csv"), 
+      write.table(trace, file = reference_trace,
                   sep=",", col.names=FALSE, row.names = FALSE)
     }
     
-    ggsave(file.path(plot_dir, paste0(s$name, "_dynamics.pdf")), p,
-           height = 2.5, width = 2.5)
   } else {
-    # plot_calibration()
+    # plot_calibration(results_dir    = file.path(wd, paste0(s$name, "_calibration")),
+    #                  reference_file = reference_trace,
+    #                  optim_trace    = file.path(wd, paste0(s$name, "_calibration"), paste0(s$name, "-calibration_optim-config.csv")),
+    #                  output_plot    = file.path(wd, "plots", paste0(s$name, "-calibration_plot.pdf")),
+    #                  width          = 6,
+    #                  height         = 4,
+    #                  base_font_size = 14)
   }
   
   additional_files <- c("ExitStatusFile", list.files(pattern="\\.log$"),
