@@ -1,0 +1,20 @@
+
+
+--------------------------------------------------------------------
+                      Generation ODE/SDE model
+--------------------------------------------------------------------
+
+
+
+Compiling general transition file
+
+java.io.FileNotFoundException: gen_tran_out.cpp (Permission denied)
+	at java.base/java.io.FileOutputStream.open0(Native Method)
+	at java.base/java.io.FileOutputStream.open(FileOutputStream.java:293)
+	at java.base/java.io.FileOutputStream.<init>(FileOutputStream.java:235)
+	at java.base/java.io.FileOutputStream.<init>(FileOutputStream.java:184)
+	at editor.domain.io.CppFormat.export(CppFormat.java:29)
+	at editor.cli.CppCommand.toolMain(CppCommand.java:100)
+	at editor.cli.CppCommand.main(CppCommand.java:38)
+EXCEPTION RAISED.
+FAILED.

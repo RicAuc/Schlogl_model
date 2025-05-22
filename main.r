@@ -1,6 +1,9 @@
 
 library(yaml)
 library(epimod)
+library(devtools)
+# install_github("https://github.com/qBioTurin/epimod", ref="epimod_pFBA")
+# install_github("https://github.com/qBioTurin/epimod", ref="master")
 # downloadContainers()
 library(parallel)
 
@@ -11,7 +14,7 @@ plot_dir  <- file.path(wd, "plots")
 source(file.path(wd, "functions/visualize_dynamics.R"))
 
 f_time = 50
-s_time = 1
+s_time = 0.1
 i_time = 0
 nodes = 2
 
@@ -19,30 +22,23 @@ cfg <- yaml::read_yaml("config.yml")
 
 reference_trace = file.path(input_dir, "upper_stable_state.csv")
 save_ref = 1
+ref_col_names = c("Time", "X1")
 
-if (file.exists(reference_trace)) {
-  ref_trace = read.table(reference_trace, header = FALSE, sep = ",")
-  colnames(ref_trace) = c("Time", "X1")
+if ( file.exists(reference_trace) ) {
+  ref_trace = read.table(reference_trace, header = FALSE, sep = " ")
+  colnames(ref_trace) = ref_col_names
   plot_ref()
   save_ref = FALSE
   
 } else {
   cat("Reference trace file not found.", "\n")
   cat("generate reference data ... ", "\n")
-  save_ref = TRUE
-}
-
-# s = cfg$settings[[12]]
-for (s in cfg$settings) {
-  cat(">>> Processing:", s$name, "...\n")
+  
+  s = cfg$settings[[save_ref]]
   
   gen_args <- list(net_fname = file.path(wd, s$pnpro))
   if (!is.null(s$customCPP)) gen_args$transitions_fname <- s$customCPP
   do.call(model.generation, gen_args)
-  
-  if(save_ref){
-    s_time = 0.1
-  }
   
   solver_dir <- file.path(wd, "input", s$name)
   if (!dir.exists(solver_dir)) dir.create(solver_dir, recursive=TRUE)
@@ -53,8 +49,47 @@ for (s in cfg$settings) {
   file.rename(files, file.path(solver_dir, files))
   ana_args <- list(
     solver_fname   = file.path(solver_dir, paste0(s$name, ".solver")),
-    # debug          = TRUE,
-    debug          = FALSE,
+    f_time         = f_time,
+    s_time         = s_time,
+    i_time         = i_time
+  )
+  if (!is.null(s$parameters)) ana_args$parameters_fname <- s$parameters
+  if (!is.null(s$functions))  ana_args$functions_fname  <- s$functions
+  if (!is.null(s$user_files)) ana_args$user_files       <- s$user_files
+  
+  file.copy(from = s$user_files,
+            to = file.path(input_dir, s$name, basename(s$user_files)),
+            overwrite = TRUE)
+  
+  do.call(model.analysis, ana_args)
+  
+  trace <- read.table(
+    file.path(wd, paste0(s$name, "_analysis/", s$name, "-analysis-1.trace")), 
+    header = TRUE, sep = "", dec = ".")
+  
+  write.table(trace, file = reference_trace,
+              sep = " ", col.names=FALSE, row.names = FALSE)
+  
+  save_ref = TRUE
+}
+
+# s = cfg$settings[[13]]
+for (s in cfg$settings) {
+  cat(">>> Processing:", s$name, "...\n")
+  
+  gen_args <- list(net_fname = file.path(wd, s$pnpro))
+  if (!is.null(s$customCPP)) gen_args$transitions_fname <- s$customCPP
+  do.call(model.generation, gen_args)
+  
+  solver_dir <- file.path(wd, "input", s$name)
+  if (!dir.exists(solver_dir)) dir.create(solver_dir, recursive=TRUE)
+  files <- setdiff(
+    list.files(pattern=paste0(s$name, "\\.")), 
+    grep("main", list.files(), value=TRUE)
+  )
+  file.rename(files, file.path(solver_dir, files))
+  ana_args <- list(
+    solver_fname   = file.path(solver_dir, paste0(s$name, ".solver")),
     f_time         = f_time,
     s_time         = s_time,
     i_time         = i_time
@@ -87,10 +122,12 @@ for (s in cfg$settings) {
     
     if ( s$calibration ) {
       
+      ini_v = read.table(file.path(wd, paste0("input/KineticsParameters", "_", s$name)), header = F)
       # Relative variation ±20%
-      variation <- 0.2
-      ini_v = c(3e-07, 1e-04, 0.001, 3.5)
+      variation <- 0.25
+      ini_v = ini_v$V1
       
+      # ana_args$s_time = 0.1
       ana_args$parallel_processors = detectCores()
       ana_args$reference_data = reference_trace
       ana_args$distance_measure = "msqd"
@@ -146,24 +183,27 @@ for (s in cfg$settings) {
     ggsave(file.path(plot_dir, paste0(s$name, "_dynamics.pdf")), p,
            height = 2.5, width = 2.5)
     
-    if(save_ref) {
-      trace <- read.table(
-        file.path(wd, paste0(s$name, "_analysis/", s$name, "-analysis-1.trace")), 
-        header = TRUE, sep = "", dec = ".")
-      
-      write.table(trace, file = reference_trace,
-                  sep=",", col.names=FALSE, row.names = FALSE)
-    }
-    
   } else {
-    # plot_calibration(results_dir    = file.path(wd, paste0(s$name, "_calibration")),
-    #                  reference_file = reference_trace,
-    #                  optim_trace    = file.path(wd, paste0(s$name, "_calibration"), paste0(s$name, "-calibration_optim-config.csv")),
-    #                  output_plot    = file.path(wd, "plots", paste0(s$name, "-calibration_plot.pdf")),
-    #                  width          = 6,
-    #                  height         = 4,
-    #                  base_font_size = 14)
-  }
+    calibration_plotting(
+      results_dir       = file.path(wd, paste0(s$name, "_calibration")),
+      reference_file    = reference_trace,
+      model_name        = s$name,
+      variable_ref      = "X1",
+      ref_col_names     = c("Time", "X1"),
+      optim_trace       = file.path(wd, paste0(s$name, "_calibration"), paste0(s$name, "-calibration_optim-config.csv")),
+      output_plot       = file.path(wd, "plots", paste0(s$name, "-calibration_plot.pdf")),
+      width             = 4,
+      height            = 2.5,
+      title_text        = "Calibration Output vs Reference",
+      subtitle_text     = NULL,
+      title_size        = 12,
+      subtitle_size     = 10,
+      axis_title_size   = 10,
+      axis_text_size    = 10,
+      legend_title_size = 9,
+      legend_text_size  = 9
+    )
+}
   
   additional_files <- c("ExitStatusFile", list.files(pattern="\\.log$"),
                         list.files(pattern="_analysis"),

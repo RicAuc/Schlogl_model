@@ -237,62 +237,74 @@ plot_stochastics <- function(f_time, s_time, i_time,
   return(p)
 }
 
-# calibration_plotting.R
-
 calibration_plotting <- function(results_dir,
+                                 model_name,
                                  reference_file,
                                  optim_trace,
                                  output_plot,
+                                 ref_col_names,
                                  width,
                                  height,
-                                 base_font_size) {
+                                 variable_ref,
+                                 title_text = "Calibration Fit vs. Reference",
+                                 subtitle_text = NULL,
+                                 title_size = 14,
+                                 subtitle_size = 12,
+                                 axis_title_size = 12,
+                                 axis_text_size = 10,
+                                 legend_title_size = 12,
+                                 legend_text_size = 10) {
   
-  # —— 1. Load reference trajectory & optimization trace ——
-  reference_df = read.table(reference_trace, header = FALSE, sep = ",")
-  colnames(ref_trace) = c("Time", "X1")
-  optim_params <- read.table(optim_trace, header = T)
+  reference_df <- read.table(reference_file, header = FALSE, sep = " ")
+  colnames(reference_df) <- ref_col_names
+  optim_params <- read.table(optim_trace, header = TRUE)
   
   read_trace <- function(id) {
     trace_file <- file.path(
       results_dir,
-      stringr::str_c("extended_calibration-calibration-", id, ".trace")
+      stringr::str_c(paste0(model_name, "-calibration-"), id, ".trace")
     )
-    df <- read.table(trace_file, header = T )
-    dist <- optim_params %>% filter(id == !!id) %>% pull(distance)
-    df %>% mutate(Distance = dist)
+    df <- read.table(trace_file, header = TRUE)
+    dist <- optim_params %>% dplyr::filter(id == !!id) %>% dplyr::pull(distance)
+    df %>% dplyr::mutate(Distance = dist)
   }
   
   all_traces <- optim_params$id %>% purrr::map_dfr(read_trace)
   
-  p <- ggplot(all_traces, aes(x = Time, y = X1, group = Distance, color = Distance)) +
-    geom_line(alpha = 0.4) +
-    geom_line(data = reference_df, aes(x = Time, y = X1),
-              color = "red", linewidth = 1.1) +
-    scale_color_gradient(
-      low      = "red",
-      mid      = "white",
-      high     = "blue",
+  p <- ggplot() +
+    geom_line(data = all_traces,
+              aes(x = Time,
+                  y = .data[[variable_ref]],
+                  group = Distance,
+                  color = Distance), alpha = 0.4) +
+    geom_line(data = reference_df,
+              aes(x = Time,
+                  y = .data[[variable_ref]]),
+              color = "red",
+              linewidth = 0.75) +
+    scale_color_gradient2(
+      low = "red",
+      mid = "white",
+      high = "blue",
       midpoint = median(all_traces$Distance),
-      name     = "Calibration\nerror"
+      name = "Calibration\nerror"
     ) +
-    labs(
-      title = "Calibration Trajectories vs. Reference",
-      x     = "Time",
-      y     = "X1"
-    ) +
-    theme_minimal(base_size = base_font_size) +
+    theme_minimal() +
+    labs(title = title_text,
+         subtitle = subtitle_text,
+         x = "Time",
+         y = variable_ref) +
     theme(
-      plot.title      = element_text(face = "bold", size = base_font_size + 2),
-      axis.title      = element_text(face = "bold"),
-      legend.position = "right",
-      legend.title    = element_text(face = "bold"),
-      legend.text     = element_text(size = base_font_size - 2),
+      plot.title       = element_text(face = "bold", size = title_size),
+      plot.subtitle    = element_text(size = subtitle_size),
+      axis.title       = element_text(face = "bold", size = axis_title_size),
+      axis.text        = element_text(size = axis_text_size),
+      legend.title     = element_text(face = "bold", size = legend_title_size),
+      legend.text      = element_text(size = legend_text_size),
+      legend.position  = "right",
       panel.grid.minor = element_blank()
     )
   
-  # —— 5. Save plot ——
-  ggsave(filename = output_plot, plot = p,
-         width = width, height = height)
-  
+  ggsave(filename = output_plot, plot = p, width = width, height = height)
   invisible(p)
 }

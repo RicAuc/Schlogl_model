@@ -1,4 +1,16 @@
 settings:
+  - name: reduced_simple
+    pnpro: "net/reduced_simple.PNPRO"
+    customCPP: null
+    parameters: null
+    functions: null
+    user_files: null
+    sensitivity: FALSE
+    calibration: FALSE
+    SSA: FALSE
+    debug: TRUE
+    index: 1
+    
   - name: extended_simple
     pnpro: "net/extended_simple.PNPRO"
     customCPP: null
@@ -8,7 +20,8 @@ settings:
     sensitivity: FALSE
     calibration: FALSE
     SSA: FALSE
-    index: 1
+    debug: TRUE
+    index: 2
 
   - name: extended_CPP_Call
     pnpro: "net/extended_CPP_Call.PNPRO"
@@ -19,17 +32,7 @@ settings:
     sensitivity: FALSE
     calibration: FALSE
     SSA: FALSE
-    index: 2
-    
-  - name: reduced_simple
-    pnpro: "net/reduced_simple.PNPRO"
-    customCPP: null
-    parameters: null
-    functions: null
-    user_files: null
-    sensitivity: FALSE
-    calibration: FALSE
-    SSA: FALSE
+    debug: TRUE
     index: 3
     
   - name: reduced_noCPP_FromList
@@ -41,6 +44,7 @@ settings:
     sensitivity: FALSE
     calibration: FALSE
     SSA: FALSE
+    debug: TRUE
     index: 4
     
   - name: reduced_CPP_Call
@@ -52,6 +56,7 @@ settings:
     sensitivity: FALSE
     calibration: FALSE
     SSA: FALSE
+    debug: TRUE
     index: 5
     
   - name: reduced_CPP_Call_FromTable
@@ -63,6 +68,7 @@ settings:
     sensitivity: FALSE
     calibration: FALSE
     SSA: FALSE
+    debug: TRUE
     index: 6
     
   - name: reduced_alternative
@@ -73,6 +79,7 @@ settings:
     user_files: null
     sensitivity: FALSE
     calibration: FALSE
+    debug: TRUE
     SSA: FALSE
     index: 7
     
@@ -85,6 +92,7 @@ settings:
     sensitivity: TRUE
     calibration: FALSE
     SSA: FALSE
+    debug: TRUE
     index: 8
 
   - name: extended_CPP_Call
@@ -95,6 +103,7 @@ settings:
     user_files: null
     sensitivity: FALSE
     calibration: FALSE
+    debug: TRUE
     SSA: TRUE
     index: 9
     
@@ -106,6 +115,7 @@ settings:
     user_files: null
     sensitivity: FALSE
     calibration: FALSE
+    debug: TRUE
     SSA: TRUE
     index: 10
     
@@ -118,6 +128,7 @@ settings:
     sensitivity: FALSE
     calibration: FALSE
     SSA: TRUE
+    debug: TRUE
     index: 11
 
   - name: extended_calibration
@@ -129,4 +140,17 @@ settings:
     sensitivity: FALSE
     calibration: TRUE
     SSA: FALSE
+    debug: TRUE
     index: 12
+    
+  - name: reduced_calibration
+    pnpro: "net/reduced_calibration.PNPRO"
+    customCPP: null
+    parameters: "input/iniData_reduced_calibration.csv"
+    functions: "functions/rfunctions.R"
+    user_files: null
+    sensitivity: FALSE
+    calibration: TRUE
+    SSA: FALSE
+    debug: TRUE
+    index: 13
